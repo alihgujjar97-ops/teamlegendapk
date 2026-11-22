@@ -1,0 +1,41 @@
+name: Build TEAM LEGEND APK
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Unzip Project
+        run: unzip -o TeamLegend_Android_Project.zip -d work
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build Installable APK
+        working-directory: work/TeamLegendAndroid
+        run: gradle assembleDebug --no-daemon
+
+      - name: Prepare APK
+        run: cp work/TeamLegendAndroid/app/build/outputs/apk/debug/app-debug.apk TEAM_LEGEND_v1.0.0.apk
+
+      - name: Upload Downloadable APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: TEAM_LEGEND_v1.0.0_APK
+          path: TEAM_LEGEND_v1.0.0.apk
+          retention-days: 90
